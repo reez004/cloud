@@ -28,7 +28,12 @@ async def chat(request: ChatRequest):
     try:
         user_message = request.message
 
-        # Make OpenRouter API call
+        # Get API key here — at request time, not startup
+        OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+        if not OPENROUTER_API_KEY:
+            return {"error": "API key not found in environment variables."}
+
+        # Call OpenRouter API
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
