@@ -3,10 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 import os
-from dotenv import load_dotenv
 
-# Load .env variables
-load_dotenv()
+# Read from Render environment
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 if not OPENROUTER_API_KEY:
     raise RuntimeError("OPENROUTER_API_KEY is not set in environment variables.")
@@ -16,23 +14,21 @@ app = FastAPI()
 # Enable CORS for Flutter app
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For production, replace * with your domain
+    allow_origins=["*"],  # In production, set to your domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Request model for chat
 class ChatRequest(BaseModel):
     message: str
 
-# POST /chat endpoint
 @app.post("/chat")
 async def chat(request: ChatRequest):
     try:
         user_message = request.message
 
-        # Call OpenRouter API
+        # Make OpenRouter API call
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
