@@ -1,35 +1,35 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import requests, os
 from dotenv import load_dotenv
-import os
-import requests
 
-# Load environment variables from .env
+# Load .env variables
 load_dotenv()
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
 
 app = FastAPI()
 
-# Enable CORS (for Flutter communication)
+# Enable CORS for Flutter app
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # For production, replace * with your domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Define the request model
+# Request model for chat
 class ChatRequest(BaseModel):
     message: str
 
-# Define the /chat endpoint
+# POST /chat endpoint
 @app.post("/chat")
 async def chat(request: ChatRequest):
     try:
         user_message = request.message
 
+        # Call OpenRouter API
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
@@ -37,7 +37,7 @@ async def chat(request: ChatRequest):
                 "Content-Type": "application/json",
             },
             json={
-                "model": "mistralai/mistral-small",
+                "model": "mistralai/mistral-7b-instruct",
                 "messages": [
                     {"role": "system", "content": "You are a helpful assistant that speaks Malayalam."},
                     {"role": "user", "content": user_message}
@@ -48,11 +48,9 @@ async def chat(request: ChatRequest):
         )
 
         data = response.json()
-
         if "choices" in data:
             return {"response": data["choices"][0]["message"]["content"].strip()}
         else:
-            print("❌ API Error:", data)
             return {"error": f"Unexpected response format: {data}"}
 
     except Exception as e:
