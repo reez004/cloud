@@ -5,7 +5,7 @@ import requests
 import os
 
 # Read from Render environment
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
 if not OPENROUTER_API_KEY:
     raise RuntimeError("OPENROUTER_API_KEY is not set in environment variables.")
 
@@ -59,3 +59,6 @@ async def chat(request: ChatRequest):
 
     except Exception as e:
         return {"error": str(e)}
+@app.get("/")
+def root():
+    return {"message": "Malayalam AI Backend is running ✅"}
