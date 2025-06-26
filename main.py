@@ -24,7 +24,7 @@ async def chat(request: ChatRequest):
         user_message = request.message
 
         # ✅ Load env at request time
-        OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+        OPENROUTER_API_KEY = "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"
         if not OPENROUTER_API_KEY:
             return {"error": "API key not found in environment variables."}
 
