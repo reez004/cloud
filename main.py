@@ -4,17 +4,12 @@ from pydantic import BaseModel
 import requests
 import os
 
-# Read from Render environment
-OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
-if not OPENROUTER_API_KEY:
-    raise RuntimeError("OPENROUTER_API_KEY is not set in environment variables.")
-
 app = FastAPI()
 
 # Enable CORS for Flutter app
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, set to your domain
+    allow_origins=["*"],  # In production, replace * with your domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -28,12 +23,12 @@ async def chat(request: ChatRequest):
     try:
         user_message = request.message
 
-        # Get API key here — at request time, not startup
+        # ✅ Load env at request time
         OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
         if not OPENROUTER_API_KEY:
             return {"error": "API key not found in environment variables."}
 
-        # Call OpenRouter API
+        # OpenRouter API request
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
@@ -59,6 +54,7 @@ async def chat(request: ChatRequest):
 
     except Exception as e:
         return {"error": str(e)}
+
 @app.get("/")
 def root():
     return {"message": "Malayalam AI Backend is running ✅"}
