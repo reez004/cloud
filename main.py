@@ -5,8 +5,7 @@ import requests
 import os
 
 # Put your Groq API key here directly OR use environment variables for security
-GROQ_API_KEY = os.getenv("GROQ_API_KEY") or "your-groq-api-key-here"
-
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY:
     raise RuntimeError("GROQ_API_KEY is not set.")
 
